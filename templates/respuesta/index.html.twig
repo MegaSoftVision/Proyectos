@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Respuesta index{% endblock %}
+
+{% block body %}
+    <h1>Respuesta index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for respuestum in respuestas %}
+            <tr>
+                <td>{{ respuestum.id }}</td>
+                <td>
+                    <a href="{{ path('respuesta_show', {'id': respuestum.id}) }}">show</a>
+                    <a href="{{ path('respuesta_edit', {'id': respuestum.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('respuesta_new') }}">Create new</a>
+{% endblock %}

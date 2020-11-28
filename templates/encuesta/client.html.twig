@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Registro</title>
+	<!-- Bootstrap CSS -->
+	{% block stylesheets %}
+	<link rel="stylesheet" href="{{asset('../public/assets/vendor/bootstrap/css/bootstrap.min.css')}}">
+	<link href="{{asset('../public/assets/vendor/fonts/circular-std/style.css')}}" rel="stylesheet">
+	<link rel="stylesheet" href="{{asset('../public/assets/libs/css/style.css')}}">
+	<link rel="stylesheet" href="{{asset('../public/assets/vendor/fonts/fontawesome/css/fontawesome-all.css')}}">
+	<link rel="stylesheet" href="{{asset('../public/assets/vendor/fonts/material-design-iconic-font/css/materialdesignicons.min.css')}}">
+
+	{% endblock %}
+
+</head>
+
+<body style="background:{{encuesta.background}}">
+
+	<!-- ============================================================== -->
+	<!-- forgot password  -->
+	<!-- ============================================================== -->
+	<div class="container">
+	
+		
+			<div class="card">
+				<div class="card-header text-center">
+                  {% if encuesta.banner is defined %}
+					<img class="logo-img" src="{{asset('uploads/banners/' ~ encuesta.banner)}}" style="width:100%;" alt="logo">
+                  {% endif %}
+                  <h1 class="text-center" style="padding-top:5%;">Bienvenido a la encuesta {{encuesta.descripcion|raw}}</h1>
+				</div>
+        {% set count_seleccion = 0 %}
+        {% set count_simple = 0 %}
+        {% set count_clasificacion = 0 %}
+      {% if encuesta.status is defined and encuesta.status == true %}
+      
+          {% if encuesta.instructivo is defined %}
+            <div class="card-body">
+              <p>{{encuesta.instructivo|raw}}</p>    
+            </div>
+          {% endif %}
+      </div>
+    
+      {% for pregunta in preguntas %}
+      <div class="card">
+        <div class="card-body">
+          <h3>{{pregunta.descripcion}}</h3>
+          <div class="form-group">
+            <div class="col-sm-12">
+              {% if pregunta.type == 'seleccion' %}
+                {% set count_seleccion = count_seleccion + 1 %}
+                {% set i2 = 0 %}
+                {% for seleccion in pregunta.seleccion %}
+
+                <div class="custom-controls-stacked">
+                  <label class="custom-control custom-radio">
+                    <input type="radio" name="seleccion-{{count_seleccion}}" {% if i2==0 %} checked{% endif %} value="{{seleccion.id}}" class="custom-control-input"><span class="custom-control-label">{{seleccion.descripcion}}</span>
+                  </label>
+                </div>
+                {% set i2 = i2 + 1 %}
+                {% endfor %}
+              {% endif %}
+              {% if pregunta.type == 'clasificacion' %}
+                {% set count_clasificacion = count_clasificacion + 1 %}
+                {% set i2 = 0 %}
+                {% for grupo in pregunta.grupos %}
+
+                <div class="custom-controls-stacked">
+                  <label class="custom-control custom-radio">
+                    <input type="radio" name="grupo-{{count_clasificacion}}" {% if i2==0 %} checked{% endif %} value="{{grupo.id}}" class="custom-control-input"><span class="custom-control-label">{{grupo.descripcion}}</span>
+                  </label>
+                </div>
+                {% set i2 = i2 + 1 %}
+                {% endfor %}
+              {% endif %}
+              {% if pregunta.type == 'simple' %}
+                {% set count_simple = count_simple + 1 %}
+                  <label>Respuesta: </label>
+                  <input type="text" name="respuesta-{{count_simple}}" class="form-control form-control-lg">
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      
+    {% endfor %}
+          
+    <div class="card">
+      <div class="card-body">   
+        <button class="btn btn-primary btn-block btn-rounded" onclick="GuardarRespuestas()">Enviar Respuestas</button>
+      </div>
+    </div>
+   
+</div>
+      {% else %}
+        <div class="card-body">
+          <p>Esta encuesta a sido cerrada.</p>
+          
+                  
+        </div>
+      {% endif %}
+      
+				
+		<!-- ============================================================== -->
+		<!-- end forgot password  -->
+		<!-- ============================================================== -->
+		<!-- Optional JavaScript -->
+
+	</body>
+
+
+	</html>
+	{% block javascripts %}
+	<script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+	<script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+	<script src="{{asset('assets/vendor/jquery/jquery-3.3.1.min.js')}}"></script>
+	<script src="{{asset('assets/vendor/bootstrap/js/bootstrap.bundle.js')}}"></script>
+
+	<script type="text/javascript">
+		function GuardarRespuestas(){
+			var Ruta = Routing.generate('encuesta_client', {id:{{encuesta.id}}});
+			var success = Routing.generate('encuesta_success');
+			var selecciones = new Array();
+			var simples = new Array();
+      		var clasificacion = new Array();
+			for (var i = 1; i <={{count_seleccion}}; i++) {
+				selecciones[i] = {
+					"id_s":$('input:radio[name=seleccion-'+i+']:checked').val(),
+				};
+			}
+			for (var i = 1; i <={{count_simple}}; i++) {
+				simples[i] = {
+					"id_r":$('input:text[name=respuesta-'+i+']').val(),
+				};
+			}
+            for (var i = 1; i <={{count_clasificacion}}; i++) {
+              clasificacion[i] = {
+                "id_c":$('input:radio[name=grupo-'+i+']:checked').val(),
+              };
+            }
+			var respuestas_simples = {
+				"simples": simples
+			}
+			var respuestas_seleccion = {
+				"selecciones": selecciones
+			}
+      		var respuestas_clasificacion = {
+				"clasificacion": clasificacion
+			}
+			var data = {
+				"pais": null,
+				"nombre": null,
+				"respuestas_seleccion":respuestas_seleccion,
+				"respuestas_simples":respuestas_simples,
+        		"respuestas_clasificacion":respuestas_clasificacion,
+			}
+			console.log(data);
+			$.ajax({
+				type: 'POST',
+				url: Ruta,
+				data: ({
+					data:data,
+
+				}),
+				async: true,
+				dataType: "json",
+				success: function(data){
+					window.location.href = success;
+
+				},
+				error : function(xhr, textStatus, errorThrown) {  
+					alert('Ajax request failed.');  
+				}  
+			})
+		}
+	</script>
+
+
+	{% endblock %}

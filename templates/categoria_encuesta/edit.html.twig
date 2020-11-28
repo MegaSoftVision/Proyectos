@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit CategoriaEncuesta{% endblock %}
+
+{% block body %}
+    <h1>Edit CategoriaEncuesta</h1>
+
+    {{ include('categoria_encuesta/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('categoria_encuesta_index') }}">back to list</a>
+
+    {{ include('categoria_encuesta/_delete_form.html.twig') }}
+{% endblock %}

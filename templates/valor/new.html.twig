@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Valor{% endblock %}
+
+{% block body %}
+    <h1>Create new Valor</h1>
+
+    {{ include('valor/_form.html.twig') }}
+
+    <a href="{{ path('valor_index') }}">back to list</a>
+{% endblock %}

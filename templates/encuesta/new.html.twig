@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Encuesta{% endblock %}
+
+{% block body %}
+    {{ include('encuesta/_form.html.twig') }}
+    <a class="btn btn-primary" href="{{ path('encuesta_index') }}">Volver a la lista</a>
+{% endblock %}

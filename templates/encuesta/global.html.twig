@@ -1,0 +1,216 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Encuesta{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+
+  <link rel="stylesheet" href="{{asset('assets/vendor/charts/c3charts/c3.css')}}">
+{% endblock %}
+
+{% block body %}
+<!-- ============================================================== -->
+<!-- pageheader  -->
+<!-- ============================================================== -->
+<div class="row">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="page-header" id="top">
+      <h2 class="pageheader-title">Ver encuesta</h2>
+      <div class="page-breadcrumb">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('encuesta_index') }}" class="breadcrumb-link">Encuestas</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">Analliticas Globales</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ============================================================== -->
+<!-- end pageheader  -->
+<!-- ============================================================== -->
+<div class="pills-vertical">
+  <div class="row">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-2 col-12">
+      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        {% for categoria in categorias_v %}
+          <a class="nav-link" href="#v-pills-{{categoria.id}}" id="v-pills-{{categoria.id}}-tab" data-toggle="pill" role="tab" aria-controls="v-pills-{{categoria.id}}" aria-selected="true">{{categoria.descripcion}}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-xl-9 col-lg-9 col-md-12 col-sm-2 col-12">
+      <div class="tab-content" id="v-pills-tabContent">
+      <!-- Comienzo del Bucle -->
+        {% for categoria in categorias_v %}
+          <div class="tab-pane fade show" id="v-pills-{{categoria.id}}" role="tabpanel" aria-labelledby="v-pills-{{categoria.id}}-tab">
+            <div class="table-responsive">
+              <table id="tabla-{{categoria.id}}" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>Sectores</th>
+                    {% for valor in categoria.valors %}
+                        <th>% de {{valor.descripcion}}</th>
+                        
+                    {% endfor %}
+                    <th>Total de Registros</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    
+                  {% for categoria_e in categorias_e %}
+                    <tr>
+                      <td>{{categoria_e.descripcion}}</td>
+                      {% set total_registros = 0 %}
+                      {% for encuesta in categoria_e.encuestas %}
+                        {% set total_registros = total_registros + encuesta.registros|length %}
+                      {% endfor %}
+                      {% for valor in categoria.valors %}
+                        {% set suma_respuestas = 0 %}
+                        {% set total_respuestas = 0 %}
+                          {% for encuesta in categoria_e.encuestas %}
+                            
+                            {% set total_respuestas = total_respuestas + encuesta.respuestas | filter(respuesta => respuesta.seleccion.valor.categoria.id == categoria.id)|length %}
+                            {% for respuesta in encuesta.respuestas %}
+                      			
+                              {% if respuesta.seleccion.valor.id is defined and respuesta.seleccion.valor.id == valor.id %}
+                                {% set suma_respuestas = suma_respuestas + 1 %}
+                              {% endif %}
+                            {% endfor %}
+                          {% endfor %}
+                          {% if total_respuestas == 0 %}
+                            {% set porcentaje = 0 %}
+                          {% else %}
+                            {% set porcentaje = suma_respuestas * 100 / total_respuestas %}
+                          {% endif %}
+                        <td>{{porcentaje | round(1, 'floor') }}%</td>
+                        
+                      {% endfor %} 
+                      <td>{{total_registros}}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>Sectores</th>
+                    {% for valor in categoria.valors %}
+                        <th>% de {{valor.descripcion}}</th>
+                        
+                    {% endfor %}
+                    <th>Total de Registros</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <br>
+           
+            <br>
+            <h5>Encuestas</h5>
+              <div class="table-responsive">
+                <table id="sector-{{categoria.id}}" class="table table-striped table-bordered" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th>Encuestas</th>
+                      {% for valor in categoria.valors %}
+                          <th>% de {{valor.descripcion}}</th>
+                          
+                      {% endfor %}
+                      <th>Total de Registros</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                   {% for categoria_e in categorias_e %}
+                    {% for encuesta in categoria_e.encuestas %}
+                      <tr>
+                        <td>{{encuesta.descripcion|striptags}}</td>
+                        {% for valor in categoria.valors %}
+                          {% set suma_respuestas = 0 %}
+                          {% set total_respuestas = 0 %}
+                          {% set total_respuestas = total_respuestas + encuesta.respuestas | filter(respuesta => respuesta.seleccion.valor.categoria.id == categoria.id)|length %}
+                          {% for respuesta in encuesta.respuestas %}
+                            {% if respuesta.seleccion.valor.id is defined and respuesta.seleccion.valor.id == valor.id %}
+                              {% set suma_respuestas = suma_respuestas + 1 %}
+                            {% endif %}
+                          {% endfor %}
+                          {% if total_respuestas == 0 %}
+                            {% set porcentaje = 0 %}
+                          {% else %}
+                            {% set porcentaje = suma_respuestas * 100 / total_respuestas %}
+                          {% endif %}
+                          <td>{{porcentaje | round(1, 'floor') }}%</td>
+                         
+                        {% endfor %} 
+                        <td>{{encuesta.registros|length}}</td>
+                      </tr>
+                    {% endfor %}
+                   {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Encuestas</th>
+                      {% for valor in categoria.valors %}
+                          <th>% de {{valor.descripcion}}</th>
+                          
+                      {% endfor %}
+                      <th>Total de Registros</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            {% endfor %}
+            
+          </div>
+        
+      <!-- Fin del Bucle-->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+<script type="text/javascript">
+    jQuery(document).ready(function($) {
+      'use strict';
+      {% for categoria in categorias_v %}
+  
+      /* Linea 279 ID de tabla */
+        if ($("#tabla-{{categoria.id}}").length) {
+
+              $(document).ready(function() {
+                  var table = $('#tabla-{{categoria.id}}').DataTable({
+                      lengthChange: false,
+                      buttons: ['copy', 'excel', 'pdf', 'print', 'colvis']
+                  });
+                    
+                  table.buttons().container()
+                      .appendTo('#tabla-{{categoria.id}}_wrapper .col-md-6:eq(0)');
+              });
+          }
+          {% for categoria_e in categorias_e %}
+      
+          /* Linea 279 ID de tabla */
+            if ($("#sector-{{categoria.id}}").length) {
+    
+                  $(document).ready(function() {
+                      var table = $('#sector-{{categoria.id}}').DataTable({
+                          lengthChange: false,
+                          buttons: ['copy', 'excel', 'pdf', 'print', 'colvis']
+                      });
+                        
+                      table.buttons().container()
+                          .appendTo('#sector-{{categoria.id}}_wrapper .col-md-6:eq(0)');
+                  });
+              }
+            
+          {% endfor %}
+      {% endfor %}
+      
+    
+      
+
+    });
+
+  </script>
+  {% endblock %}

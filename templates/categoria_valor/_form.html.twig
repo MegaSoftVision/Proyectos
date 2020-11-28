@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+ <div class="card">
+  <div class="card-body">
+   <h3 class="card-title">Crear Categoría</h3>
+    {{ form_label(form.descripcion, 'Descripción de la categoria') }}
+    {{ form_widget(form.descripcion, {'attr': {'class': 'form-control form-control-lg', 'placeholder':'Descripcion de la categoria'}}) }}
+    <button href="#" class="btn btn-primary mt-4">{{ button_label|default('Guardar') }}</button>
+   </div>
+  </div>
+</div>
+{{ form_end(form) }}

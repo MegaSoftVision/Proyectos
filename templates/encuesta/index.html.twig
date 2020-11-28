@@ -1,0 +1,282 @@
+  {% extends 'base.html.twig' %}
+
+  {% block title %}Encuestas{% endblock %}
+
+  {% block body %}
+    <!-- ============================================================== -->
+    <!-- pageheader  -->
+    <!-- ============================================================== -->
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="page-header" id="top">
+          <div class="row justify-content-between mb-4">
+            <h2 class="pageheader-title col-lg-4 col-md-9 col-sm-9 col-4">Listado de Encuestas</h2>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-2">
+              <a data-toggle="tooltip" data-placement="left" title="Haz click aquí para crear una nueva encuesta" href="{{ path('encuesta_new') }}" class="btn btn-primary">Nueva Encuesta</a>
+            </div>
+          </div>
+          <div class="page-breadcrumb">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">Encuestas</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Analisis</h1>
+        <div class="col-3 col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-inline-block">
+                <h5 class="text-muted">Total de Encuestas</h5>
+                {% if query_status is not empty and query_category is not empty%}
+                  <h2 class="mb-0">{{encuestas| filter(encuesta => encuesta.status == query_status and encuesta.categoria.id == query_category) | length}}</h2>
+                {% else %}
+                    <h2 class="mb-0">{{encuestas|length}}</h2>
+                {% endif %}
+                
+              </div>
+              <div class="float-right icon-circle-medium  icon-box-lg  bg-primary-light mt-1">
+                <i class="fa fa-user fa-fw fa-sm text-primary"></i>
+              </div>
+            </div>
+          </div>
+        </div>   
+      </div>
+    <form method="GET">
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Filtrar por Categoria:</label>
+                <select name="category" class="form-control" id="exampleFormControlSelect1">
+                  <option value="">Global</option>
+                  {% for categoria in categorias %}
+                    <option {% if query_category == categoria.id %} selected {% endif %} value="{{categoria.id}}">{{categoria.descripcion}}</option>
+                  {% endfor %}  
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Filtrar por Estatus:</label>
+                <select name="query_status" class="form-control" id="exampleFormControlSelect1">
+                  <option value="">Global</option>
+                  <option {% if query_status == 0 %} selected {% endif %} value="0">Cerradas</option>
+                  <option {% if query_status == 1 %} selected {% endif %} value="1">Abiertas</option>
+
+                </select>
+              </div>
+              <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-search fa-sm"></i></button>
+            </form>
+          
+    <!-- ============================================================== -->
+    <!-- end pageheader  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- card header footer  -->
+    <!-- ============================================================== -->
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="section-block" id="cardaction">
+          <h3 class="section-title">Mis Encuestas</h3>
+        </div>
+      </div>
+      {% if query_status is not empty and query_category is not empty %}
+        {% for encuesta in encuestas | filter(encuesta => encuesta.status == query_status and encuesta.categoria.id == query_category) %}
+          {% if encuesta.status == true %}
+            {% set estatus = "Abierto" %}
+            {% set estatus_action = "Cerrar" %}
+          {% else %}
+            {% set estatus = "Cerrado" %}
+            {% set estatus_action = "Abrir" %}
+          {% endif %}
+          {% if encuesta.categoria.descripcion is defined %}
+            {% set categoria_d = encuesta.categoria.descripcion %}
+
+          {% else %}
+            {% set categoria_d = "Sin Categoria" %}
+
+          {% endif %}
+          <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12">
+          {% if encuesta.banner is defined %}
+            <img src="{{asset('uploads/banners/' ~ encuesta.banner)}}" height="141px" class="card-img-top img-fluid" alt="">
+          {% endif %}
+            <div class="card">
+              <div class="card-header d-flex">
+                <h4 class="mb-0"> {{encuesta.descripcion|raw}}<p class="card-text text-left">
+                  <small class="text-muted">{{categoria_d}}</small><br>
+                  <small class="text-muted">{{estatus}}</small>
+                </p></h4>
+
+                <div class="dropdown ml-auto">
+                  <a class="toolbar" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="mdi mdi-dots-vertical"></i>  </a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+
+                    <a class="dropdown-item" href="{{ path('encuesta_status', {'id': encuesta.id}) }}" data-toggle="tooltip" data-placement="right" title="Haz click aqui para cambiar el estatus de la encuesta">{{estatus_action}} Encuesta</a>
+                  
+                    <a class="dropdown-item" href="{{ path('encuesta_duply', {'id': encuesta.id}) }}" data-toggle="tooltip" data-placement="right" title="Haz click aqui para copiar la encuesta">Copiar</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#modal-delete-{{encuesta.id}}" href="#">Eliminar</a>
+                  </div>
+                  <!-- Modal -->
+                  <div class="modal fade" id="modal-delete-{{encuesta.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Eliminar Encuesta</h5>
+                          <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </a>
+                        </div>
+                        <form method="post" action="{{ path('encuesta_delete', {'id': encuesta.id}) }}">
+                          <div class="modal-body">
+                            <p>¿Estás seguro de que quieres eliminar esta encuesta?</p>
+                            <ul>Se eliminaran los siguientes datos relacionados a esta encuesta:
+                              <li><i class="secundary mdi mdi-account-remove"></i> Registros y sus respuestas</li>
+                              <li><i class="secundary mdi mdi-comment-question-outline"></i> Preguntas</li>
+                              <li><i class="secundary mdi mdi-comment-remove-outline"></i> Selecciones y sus Valores</li>
+                            </ul>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ encuesta.id) }}">
+                          </div>
+                          <div class="modal-footer">
+                            <a href="#" class="btn btn-secondary" data-dismiss="modal">Cerrar</a>
+                            <button class="btn btn-primary">Eliminar</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="card-body" style="border-top:2px solid {{encuesta.background}};">
+              
+                <a href="{{ path('encuesta_show', {'id': encuesta.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Haz click aquí para ver la encuesta">Ver Encuesta</a>
+                <a href="{{ path('encuesta_edit', {'id': encuesta.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Haz click aquí para editar la encuesta">Editar Encuesta</a>
+                <p class="card-text text-right">
+                  <small class="text-muted">{{encuesta.dateCreate ? encuesta.dateCreate|date('Y-m-d') : ' '}}</small>
+                </p>
+
+              </div>
+              <div class="card-footer">
+                <p>Compartir</p>
+                {% set url = "https://reclutamiento.grupoeres.com/public/index.php/encuesta/" ~ encuesta.id ~ "/registro" %}
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Facebook" target="_blank" href="//www.facebook.com/sharer.php?u={{url}}" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Twitter" target="_blank" href="//twitter.com/share?url=¡Te invito a participar a la encuesta: {{encuesta.descripcion}}! ¡Haz click aqui ya! {{url}}" class="twitter"><i class="fab fa-twitter"></i></a>
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Whatsapp" target="_blank" data-action="share/whatsapp/share" href="//api.whatsapp.com/send?text=¡Te invito a participar a la encuesta: {{encuesta.descripcion}}! ¡Haz click aqui ya! {{url}}"><i class="fab fa-whatsapp"></i></a>
+                <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Copiar en el portapapeles" onclick="copyToClipboard('#p-{{encuesta.id}}')"><p  id="p-{{encuesta.id}}">{{url}}</p></a>
+              </div>
+            </div>
+          </div>
+        
+        {% endfor %}
+       {% else %}
+      	{% for encuesta in encuestas %}
+          {% if encuesta.status == true %}
+            {% set estatus = "Abierto" %}
+            {% set estatus_action = "Cerrar" %}
+          {% else %}
+            {% set estatus = "Cerrado" %}
+            {% set estatus_action = "Abrir" %}
+          {% endif %}
+          {% if encuesta.categoria.descripcion is defined %}
+            {% set categoria_d = encuesta.categoria.descripcion %}
+
+          {% else %}
+            {% set categoria_d = "Sin Categoria" %}
+
+          {% endif %}
+          <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12">
+          {% if encuesta.banner is defined %}
+            <img src="{{asset('uploads/banners/' ~ encuesta.banner)}}" height="141px" class="card-img-top img-fluid" alt="">
+          {% endif %}
+            <div class="card">
+              <div class="card-header d-flex">
+                <h4 class="mb-0"> {{encuesta.descripcion|raw}}<p class="card-text text-left">
+                  <small class="text-muted">{{categoria_d}}</small><br>
+                  <small class="text-muted">{{estatus}}</small>
+                </p></h4>
+
+                <div class="dropdown ml-auto">
+                  <a class="toolbar" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="mdi mdi-dots-vertical"></i>  </a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+
+                  <a class="dropdown-item" href="{{ path('encuesta_status', {'id': encuesta.id}) }}" data-toggle="tooltip" data-placement="right" title="Haz click aqui para cambiar el estatus de la encuesta">{{estatus_action}} Encuesta</a>
+
+                    <a class="dropdown-item" href="{{ path('encuesta_duply', {'id': encuesta.id}) }}" data-toggle="tooltip" data-placement="right" title="Haz click aqui para copiar la encuesta">Copiar</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#modal-delete-{{encuesta.id}}" href="#">Eliminar</a>
+                  </div>
+                  <!-- Modal -->
+                  <div class="modal fade" id="modal-delete-{{encuesta.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Eliminar Encuesta</h5>
+                          <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </a>
+                        </div>
+                        <form method="post" action="{{ path('encuesta_delete', {'id': encuesta.id}) }}">
+                          <div class="modal-body">
+                            <p>¿Estás seguro de que quieres eliminar esta encuesta?</p>
+                            <ul>Se eliminaran los siguientes datos relacionados a esta encuesta:
+                              <li><i class="secundary mdi mdi-account-remove"></i> Registros y sus respuestas</li>
+                              <li><i class="secundary mdi mdi-comment-question-outline"></i> Preguntas</li>
+                              <li><i class="secundary mdi mdi-comment-remove-outline"></i> Selecciones y sus Valores</li>
+                            </ul>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ encuesta.id) }}">
+                          </div>
+                          <div class="modal-footer">
+                            <a href="#" class="btn btn-secondary" data-dismiss="modal">Cerrar</a>
+                            <button class="btn btn-primary">Eliminar</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="card-body" style="border-top:2px solid {{encuesta.background}};">
+                <a href="{{ path('encuesta_show', {'id': encuesta.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Haz click aquí para ver la encuesta">Ver Encuesta</a>
+                <a href="{{ path('encuesta_edit', {'id': encuesta.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Haz click aquí para editar la encuesta">Editar Encuesta</a>
+                <p class="card-text text-right">
+                  <small class="text-muted">{{encuesta.dateCreate ? encuesta.dateCreate|date('Y-m-d') : ' '}}</small>
+                </p>
+
+              </div>
+              <div class="card-footer">
+                <p>Compartir</p>
+                {% set url = "https://reclutamiento.grupoeres.com/public/index.php/encuesta/" ~ encuesta.id ~ "/registro" %}
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Facebook" target="_blank" href="//www.facebook.com/sharer.php?u={{url}}" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Twitter" target="_blank" href="//twitter.com/share?url=¡Te invito a participar a la encuesta: {{encuesta.descripcion}}! ¡Haz click aqui ya! {{url}}" class="twitter"><i class="fab fa-twitter"></i></a>
+                <a data-toggle="tooltip" data-placement="top" title="Compartir en Whatsapp" target="_blank" data-action="share/whatsapp/share" href="//api.whatsapp.com/send?text=¡Te invito a participar a la encuesta: {{encuesta.descripcion}}! ¡Haz click aqui ya! {{url}}"><i class="fab fa-whatsapp"></i></a>
+                <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Copiar en el portapapeles" onclick="copyToClipboard('#p-{{encuesta.id}}')"><p  id="p-{{encuesta.id}}">{{url}}</p></a>
+              </div>
+            </div>
+          </div>
+        
+        {% endfor %}
+       {% endif %}
+    </div>
+    
+    <!-- ============================================================== -->
+    <!-- end card header footer  -->
+    <!-- ============================================================== -->
+  {% endblock %}
+  {% block javascripts %}
+    {{parent()}}
+    <script type="text/javascript">
+    function copyToClipboard(elemento) {
+      var $temp = $("<input>")
+      $("body").append($temp);
+      $temp.val($(elemento).text()).select();
+      document.execCommand("copy");
+      $temp.remove();
+    }
+    </script>
+  {% endblock %}

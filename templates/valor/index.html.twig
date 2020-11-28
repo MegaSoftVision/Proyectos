@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Valores{% endblock %}
+
+{% block body %}
+  <style media="screen">
+    .border-none{
+      border:none;
+    }
+    .font-input{
+      color:#454653;
+      font-size: 20px;
+    }
+    .accrodion-regular .card .card-header{
+      background-color:#00000014;
+    }
+    .card .card-header{
+      background-color:#00000014;
+    }
+    
+  </style>
+  
+  
+  <div class="row">
+    <div class="col-xl-10">
+      <!-- ============================================================== -->
+      <!-- pageheader  -->
+      <!-- ============================================================== -->
+      <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+         
+          <div class="page-header" id="top" tabindex="-1">
+            <h2 class="pageheader-title">Valores</h2>
+          </div>
+        </div>
+      </div>
+      <div class="section-block" id="block-valores"></div> 
+      <div class="card">
+        <div class="card-header" id="headingSeven">
+          <h5 class="md-0">
+            <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#valores" ara-expanded="false" aria-controls="valores" name="button">
+              <span class="fas m4-3 fa-angle-down"></span> Valores
+            </button>
+          </h5>
+        </div>
+        <div class="card-body" style="background:#f4f4f8">
+          <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" id="valores-body">
+              
+            </div>
+            <div class="card-footer" id="crear-valor">
+              <div class="card-footer-item card-footer-item-bordered">
+                <a href="javascript: void(0);" class="card-link" onClick="CrearValor()">
+                  <i class="fas fa-plus"></i> Crear Valor
+                </a>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block javascripts %}
+  {{parent()}}
+  <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+  <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+  <script src="{{asset('documentation/js/ajax-call-valor.js')}}"></script>
+
+  <script type="text/javascript">
+    window.onload(ListarValores());
+  </script>
+  
+{% endblock %}

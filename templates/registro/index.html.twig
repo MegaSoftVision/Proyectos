@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registros{% endblock %}
+
+{% block body %}
+<div class="page-header">
+  <h2 class="pageheader-title">Listado de Registros</h2>
+  <div class="page-breadcrumb">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Registros</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+</div>
+</div>
+<!-- ============================================================== -->
+<!-- end pageheader -->
+<!-- ============================================================== -->
+<div class="row">
+  <!-- ============================================================== -->
+  <!-- data table  -->
+  <!-- ============================================================== -->
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Listado de Registros</h5>
+        <p>Este es un listado general de todos los registros hechos por todas las encuestas, para ver un registro de una encuesta, acceda a la misma.</p>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="example" class="table table-striped table-bordered second" style="width:100%">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>País</th>
+                <th>Encuesta</th>
+                <th>Botones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for registro in registros | filter(registro => registro.encuesta.user == app.user) %}
+              <tr>
+                <td>{{registro.nombre}}</td>
+                <td>{{registro.pais}}</td>
+                <td>{{registro.encuesta.descripcion}}</td>
+                <td>
+                  <a href="{{ path('registro_show', {id: registro.id}) }}" class="btn btn-rounded btn-primary"><i class="fas fa-fw fa-chart-pie"></i></a>
+                  <form class="" action="{{ path('registro_delete', {'id': registro.id}) }}" method="post" onsubmit="return confirm('¿Quieres eliminar este registro?');">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ registro.id) }}">
+                    <button class="btn btn-rounded btn-danger"><i class="far fa-trash-alt fa-fw"></i></button>
+                  </form>
+                  
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td>No se ha encontrado ningun dato</td>
+              </tr>
+              {% endfor %}
+              
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Nombre</th>
+                <th>País</th>
+                <th>Encuesta</th>
+                <th>Botones</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+  <!-- ============================================================== -->
+  <!-- end data table  -->
+  <!-- ============================================================== -->
+  {% endblock %}

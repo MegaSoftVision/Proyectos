@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+ 
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Login{% endblock %}</title>
+  
+    <!-- Bootstrap CSS -->
+  	<!-- Bootstrap CSS -->
+  {% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('../public/assets/vendor/bootstrap/css/bootstrap.min.css')}}">
+    <link href="{{asset('../public/assets/vendor/fonts/circular-std/style.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('../public/assets/libs/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('../public/assets/vendor/fonts/fontawesome/css/fontawesome-all.css')}}">
+	<link rel="stylesheet" href="{{asset('../public/assets/vendor/fonts/material-design-iconic-font/css/materialdesignicons.min.css')}}">
+  {% endblock %}
+    <style>
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+    </style>
+</head>
+<body>
+    <!-- ============================================================== -->
+    <!-- login page  -->
+    <!-- ============================================================== -->
+    <div class="splash-container">
+        <div class="card ">
+            <div class="card-header text-center"><a href="../index.html"><img class="logo-img" src="../assets/images/logo.png" alt="logo"></a><span class="splash-description">Ingresa Tus Datos.</span></div>
+            <div class="card-body">
+                <form method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+                
+                {% if app.user %}
+                    <div class="mb-3">
+                        Has iniciado sesión como {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
+                  
+                    <div class="form-group">
+                         <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control-lg" placeholder="Email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" id="inputPassword" class="form-control-lg" placeholder="Contraseña" required>
+                    </div>
+                  <input type="hidden" name="_csrf_token"
+                     value="{{ csrf_token('authenticate') }}"
+                     >
+                    <div class="form-group">
+                        <label class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" name="_remember_me"><span class="custom-control-label">Recuerdame</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Entrar</button>
+                </form>
+            </div>
+            <div class="card-footer bg-white p-0 justify-content-center">
+                <div class="card-footer-item card-footer-item-bordered col-lg-6">
+                    <a href="#" class="footer-link">Olvidé Mi Contraseña</a>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <!-- ============================================================== -->
+    <!-- end login page  -->
+    <!-- ============================================================== -->
+    <!-- Optional JavaScript -->
+  {% block javascripts %}
+    <script src="{{asset('assets/vendor/jquery/jquery-3.3.1.min.js')}}"></script>
+    <script src="{{asset('assets/vendor/bootstrap/js/bootstrap.bundle.js')}}"></script>
+    <script src="{{asset('assets/vendor/slimscroll/jquery.slimscroll.js')}}"></script>
+    <script src="{{asset('assets/libs/js/main-js.js')}}"></script>
+  {% endblock %}
+</body>
+
+</html>
+
+
+
+
+
+

@@ -1,0 +1,256 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Encuesta{% endblock %}
+
+{% block body %}
+  <style media="screen">
+    .border-none{
+      border:none;
+    }
+    .font-input{
+      color:#454653;
+      font-size: 20px;
+    }
+    .accrodion-regular .card .card-header{
+      background-color:#00000014;
+    }
+    .card .card-header{
+      background-color:#00000014;
+    }
+    
+  </style>
+  
+  <div id="pregunta"></div>
+  <div class="row">
+    <div class="col-xl-10">
+      <!-- ============================================================== -->
+      <!-- pageheader  -->
+      <!-- ============================================================== -->
+      <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+         
+          <div class="page-header" id="top" tabindex="-1">
+            <h2 class="pageheader-title">Editar Encuesta</h2>
+            <div class="page-breadcrumb">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="{{ path('encuesta_index') }}" class="breadcrumb-link">Encuestas</a></li>
+                  <li class="breadcrumb-item">Editar Encuesta</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ============================================================== -->
+      <!-- end pageheader  -->
+      <!-- ============================================================== -->
+      <!-- ============================================================== -->
+      <!-- basic form  -->
+      <!-- ============================================================== -->
+      <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+          <div class="section-block" id="basicform">
+            {% if encuesta.banner is defined %}
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="md-0">Encabezado</h5>
+                </div>
+                <div class="card-body">
+                  <img src="{{asset('uploads/banners/' ~ encuesta.banner)}}" height="241px" class="card-img-top" alt="">
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          	<div class="card">
+            
+            	<div class="card-body">
+              		<div class="form-group">
+                      <label for="">Titulo</label>
+                  		<input id="encuesta-descripcion-{{encuesta.id}}" type="text" value="{{encuesta.descripcion}}" style="font-size:20px;" class="border-none form-control form-control-lg">
+                	</div>
+                  <div class="form-group">
+                    <label for="">Categoria</label>
+                    <select class="border-none form-control form-control-lg" id="encuesta-categoria-{{encuesta.id}}">
+                    {% if encuesta.categoria.id is defined %}
+                      <option value="{{encuesta.categoria.id}}">{{encuesta.categoria.descripcion}}</option>
+                      
+                    {% else %}
+                      <option value="null">Sin Categoria</option>
+                      
+                    {% endif %}
+                    {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria.descripcion}}</option>
+                    {% endfor %}
+                    </select>
+                  </div>
+                  {% if encuesta.instructivo is defined %}
+                  	<div class="form-group">
+                      <label for="col-form-label">Instructivo</label>
+                        
+                      <textarea id="encuesta-instructivo-{{encuesta.id}}" class="border-none form-control form-control-lg">{{encuesta.instructivo}}</textarea>
+                	  </div>
+                  {% endif %}          
+                  <div class="form-group">
+                      <label for="col-form-label">Fondo</label>
+                  		<input id="encuesta-color-{{encuesta.id}}" type="color" value="{{encuesta.background}}" style="height:50px!important;" class="border-none form-control">
+                	</div>
+                  
+                  {{ form_start(form) }}
+                  <div class="form-group">
+                    {{ form_label(form.banner, 'Banner de la encuesta') }}
+                    {{ form_widget(form.banner, {'attr': {'class': 'form-control form-control-lg border-none', 'placeholder':'Banner de la encuesta'}}) }}
+                    {{ form_widget(form.descripcion, {'attr': {'style': 'display:none;'}}) }}
+                  </div>
+                  <button class="btn btn-success">{{ button_label|default('Subir') }}</button>
+                  {{ form_end(form) }}
+            	</div>
+            	<div class="card-footer">
+              		<div class="card-footer-item card-footer-item-bordered">
+                		<a href="javascript: void(0);" onClick="GuardarEncuesta({{encuesta.id}})">Guardar</a>
+              		</div>
+              		<div class="card-footer-item card-footer-item-bordered">
+                		<a class="" data-toggle="modal" data-target="#exampleModal" href="#">Eliminar</a>
+              		</div>
+            	</div>
+          	</div>
+        </div>
+      </div>
+      
+      <div class="accrodion-regular">
+        <div id="acrodion-regular">
+          <div class="section-block" id="block-valores"></div> 
+          <div class="card">
+            <div class="card-header" id="headingSeven">
+              <h5 class="md-0">
+                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#valores" ara-expanded="false" aria-controls="valores" name="button">
+                  <span class="fas m4-3 fa-angle-down"></span> Valores
+                </button>
+              </h5>
+            </div>
+            <div id="valores" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion3" style>
+              <div class="card-body" style="background:#f4f4f8">
+                <div class="row">
+                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" id="valores-body">
+                  
+                  </div>
+                </div> 
+              </div>
+            </div>
+          </div>
+          <div class="section-block" id="block-encuesta"></div> 
+          <div class="card">
+            <div class="card-header" id="headingSeven">
+              <h5 class="md-0">
+                <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeven" ara-expanded="false" aria-controls="collapseSeven" name="button">
+                  <span class="fas m4-3 fa-angle-down"></span> Encuesta
+                </button>
+               <button class="btn btn-success" onclick="Posiciones({{encuesta.id}})">
+                Actualizar Posiciones
+                </button>
+              </h5>
+            </div>
+            <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion3" style>
+              <div class="card-body" style="background:#f4f4f8">
+                <div class="row">
+                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" id="encuesta">
+                    
+                     </div> 
+                  </div>
+                </div> 
+                  <div class="card-footer" id="crear-pregunta">
+                    <div class="card-footer-item card-footer-item-bordered">
+                      <div class="dropdown">
+                        <a href="javascript: void(0);" class="card-link" type="button" id="typePregunta" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" name="button">
+                          <i class="fas fa-plus"></i> Añadir Pregunta
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="javascript: void(0);" onclick="CrearPregunta({{encuesta.id}}, 0)">Respuesta Simple</a>
+                          <a class="dropdown-item" href="javascript: void(0);" onclick="CrearPregunta({{encuesta.id}}, 1)">Selección Simple</a>
+                          <a class="dropdown-item" href="javascript: void(0);" onclick="CrearPregunta({{encuesta.id}}, 2)">Clasificación</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+      
+      <!-- ============================================================== -->
+      <!-- end basic form  -->
+      <!-- ============================================================== -->
+      
+    </div>
+    <!-- ============================================================== -->
+    <!-- sidenavbar -->
+    <!-- ============================================================== -->
+    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12 col-12">
+      <div class="sidebar-nav-fixed">
+      
+        <ul class="list-unstyled">
+          <li><a href="#block-valores">Ir a Valores</a></li>
+          <li><a href="#block-encuesta">Ir a Preguntas</a></li>
+        </ul>
+        <ul class="list-unstyled" id="sidebar">
+        
+        </ul>
+        <ul class="list-unstyled">
+          <li><a href="#basicform">Ir a Arriba</a></li>
+          
+        </ul>
+      </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- end sidenavbar -->
+    <!-- ============================================================== -->
+    
+  </div>
+  
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Eliminar Encuesta</h5>
+          <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </a>
+        </div>
+        <form method="post" action="{{ path('encuesta_delete', {'id': encuesta.id}) }}">
+          <div class="modal-body">
+            <p>¿Estás seguro de que quieres eliminar esta encuesta?</p>
+            <ul>Se eliminaran los siguientes datos relacionados a esta encuesta:
+              <li><i class="secundary mdi mdi-account-remove"></i> Registros y sus respuestas</li>
+              <li><i class="secundary mdi mdi-comment-question-outline"></i> Preguntas</li>
+              <li><i class="secundary mdi mdi-comment-remove-outline"></i> Selecciones y sus Valores</li>
+            </ul>
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ encuesta.id) }}">
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-secondary" data-dismiss="modal">Cerrar</a>
+            <button class="btn btn-primary">Eliminar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div id="modal">
+    
+  </div>
+{% endblock %}
+{% block javascripts %}
+  {{parent()}}
+	¡
+	
+  <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+  <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+  <script src="{{asset('documentation/js/ajax-call-encuesta.js')}}"></script>
+
+  <script type="text/javascript">
+    window.onload(ListarPreguntas({{encuesta.id}}));
+  </script>
+  
+{% endblock %}

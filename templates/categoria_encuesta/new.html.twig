@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New CategoriaEncuesta{% endblock %}
+
+{% block body %}
+    <h1>Create new CategoriaEncuesta</h1>
+
+    {{ include('categoria_encuesta/_form.html.twig') }}
+
+    <a href="{{ path('categoria_encuesta_index') }}">back to list</a>
+{% endblock %}

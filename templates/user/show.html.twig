@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User{% endblock %}
+
+{% block body %}
+<div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                              <div class="row justify-content-between">
+                                    <div class="col-2">
+                                      <a href="{{ path('user_index') }}"><i class="fas fa-fw fa-angle-left mr-2"></i>Volver a la lista</a>  
+                                    </div>
+                                    <div class="col-1">
+                                      <div class="dropdown ml-auto">
+                                            <a class="toolbar" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="mdi mdi-dots-vertical"></i>  </a>
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+                                                <a class="dropdown-item" href="{{ path('user_edit', {'id': user.id}) }}">Editar</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="user-avatar text-center d-block">
+                                        <img src="{{asset('../public/assets/images/avatar-1.jpg')}}" alt="User Avatar" class="rounded-circle user-avatar-xxl">
+                                    </div>
+                                    <h2 class="mb-3 text-center">Enif Velasquez</h2>
+                                    <h3 class="mb-0 text-primary text-center">Grupo Eres</h3>
+                                </div>
+                                <div class="border-bottom text-center">
+                                    <h4>Información de contacto</h4>
+                                    <div class="">
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-2"><i class="fas fa-fw fa-envelope mr-2"></i>{{ user.email }}</li>
+                                            <li class="mb-0"><i class="fas fa-fw fa-phone mr-2"></i>(900) 123 4567</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                    <div class="product-description">
+                                            <h4 class="mb-1 text-center">Descripción de la empresa</h4>
+                                            <p>Praesent et cursus quam. Etiam vulputate est et metus pellentesque iaculis. Suspendisse nec urna augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;</p>
+                                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+{% endblock %}

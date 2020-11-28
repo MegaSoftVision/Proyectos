@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CategoriaEncuesta{% endblock %}
+
+{% block body %}
+    <h1>CategoriaEncuesta</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ categoria_encuestum.id }}</td>
+            </tr>
+            <tr>
+                <th>Descripcion</th>
+                <td>{{ categoria_encuestum.descripcion }}</td>
+            </tr>
+            <tr>
+                <th>Date_create</th>
+                <td>{{ categoria_encuestum.dateCreate ? categoria_encuestum.dateCreate|date('Y-m-d') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('categoria_encuesta_index') }}">back to list</a>
+
+    <a href="{{ path('categoria_encuesta_edit', {'id': categoria_encuestum.id}) }}">edit</a>
+
+    {{ include('categoria_encuesta/_delete_form.html.twig') }}
+{% endblock %}

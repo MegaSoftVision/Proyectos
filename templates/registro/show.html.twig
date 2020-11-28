@@ -1,0 +1,314 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block body %}
+<div class="page-header">
+  <h2 class="pageheader-title">Registro de {{registro.nombre}}</h2>
+  <div class="page-breadcrumb">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{path('registro_index')}}" class="breadcrumb-link">Registros</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{registro.nombre}}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+</div>
+</div>
+<!-- ============================================================== -->
+<!-- end pageheader -->
+<!-- ============================================================== -->
+<div class="row">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <h3>{{registro.nombre}}</h3>
+    <p>{{registro.pais}}</p>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <!-- ============================================================== -->
+        <!-- bar chart  -->
+        <!-- ============================================================== -->
+        <div class="row">
+          <div class="card col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+            <h5 class="card-header">Analíticas</h5>
+            <div class="card-body">
+              <canvas id="respuestas"></canvas>
+              
+            </div>
+          </div>
+          <div class="card col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+            <h5 class="card-header">Analíticas</h5>
+            <div class="card-body">
+              <div id="donut"></div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <!-- ============================================================== -->
+        <!-- end bar chart  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- hoverable table -->
+        <!-- ============================================================== -->
+        <div class="card">
+          <h5 class="card-header">Respuestas de Seleccion</h5>
+          <div class="card-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Pregunta</th>
+                  <th scope="col">Seleccion</th>
+                  <th scope="col">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set i = 1 %}
+                {% for respuesta in respuestas %}
+                <tr>
+                  <th scope="row">{{i}}</th>
+                  <td>{{respuesta.pregunta.descripcion}}</td>
+                  <td>{{respuesta.seleccion.descripcion}}</td>
+                  <td>{{respuesta.seleccion.valor.descripcion}}</td>
+                </tr>
+                {% set i = i + 1%}
+                {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+		<div class="card">
+          <h5 class="card-header">Respuestas Simples</h5>
+          <div class="card-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Pregunta</th>
+                  <th scope="col">Respuesta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set i = 1 %}
+                {% for respuesta in respuestas_s %}
+                <tr>
+                  <th scope="row">{{i}}</th>
+                  <td>{{respuesta.pregunta.descripcion}}</td>
+                  <td>{{respuesta.descripcion}}</td>
+                
+                </tr>
+                {% set i = i + 1%}
+                {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h5 class="card-header">Clasificacion</h5>
+          <div class="card-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Pregunta</th>
+                  <th scope="col">Respuesta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set i = 1 %}
+                {% for respuesta in respuestas_g %}
+                <tr>
+                  <th scope="row">{{i}}</th>
+                  <td>{{respuesta.pregunta.descripcion}}</td>
+                  <td>{{respuesta.grupo.descripcion}}</td>
+                
+                </tr>
+                {% set i = i + 1%}
+                {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- end hoverable table -->
+        <!-- ============================================================== -->
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <h2>{{ registro.encuesta.descripcion }}</h2>
+        <ul class="list-unstyled arrow">
+          <li>{{ registro.encuesta.dateCreate ? registro.encuesta.dateCreate|date('Y-m-d') : '' }}</li>
+        </ul>
+      </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- end overview  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- input groups -->
+    <!-- ============================================================== -->
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        {% for pregunta in registro.encuesta.pregunta %}
+        <div class="section-block" id="pregunta-{{pregunta.id}}"></div>
+        <div class="card">
+          <div class="card-body border-top">
+            <h4>{{pregunta.descripcion}}</h4>
+
+            {% for seleccion in pregunta.seleccion %}
+              {% set html = "<p>Hola</p>" %}
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" checked="" class="custom-control-input" disabled>
+                    <span class="custom-control-label">{{seleccion.valor.descripcion}}</span>
+                    
+                </label>
+            {% endfor %}
+          </div>
+        </div>    
+        {% endfor %}
+        
+      </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- end input groups -->
+    <!-- ============================================================== -->
+  
+  {% endblock %}
+  
+  {% block javascripts %}
+  {{parent()}}
+  <script src="{{asset('assets/vendor/charts/morris-bundle/raphael.min.js')}}" type="text/javascript"></script>
+  <script src="{{asset('assets/vendor/charts/morris-bundle/morris.js')}}" type="text/javascript"></script>
+  <script src="{{asset('assets/vendor/charts/morris-bundle/Morrisjs.js')}}" type="text/javascript"></script>
+  
+  
+  <script type="text/javascript">
+    var valores = [];
+    {% for valor in registro.encuesta.valors %}
+    valores.push({{valor.id}})
+    {% endfor %}
+    var respuestas = [];
+    
+    {% for respuesta in respuestas %}
+    respuestas.push({{respuesta.seleccion.valor.id}})
+    
+    {% endfor %}
+    var contador = new Array(valores.length);
+    contador.fill(0);
+    for (var i = 0; i < valores.length; i++) {
+      for (var j = 0; j < respuestas.length; j++) {
+        if (valores[i] == respuestas[j]) {
+          contador[i] = contador[i] + 1;
+        }
+      }
+    }
+    
+    
+    (function(window, document, $, undefined) {
+      "use strict";
+      $(function() {
+        if ($('#respuestas').length) {
+          var ctx = document.getElementById("respuestas").getContext('2d');
+          
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              //labels: ["M", "T", "W", "R", "F", "S", "S"],
+              datasets: [
+              {% set i = 0 %}
+              {% for valor in registro.encuesta.valors %}
+              
+              {
+                label: '{{valor.descripcion}}',
+                data: [contador[{{i}}]],
+                backgroundColor: "{{valor.color}}",
+                borderColor: "#b1b3c3",
+                borderWidth: 2
+              },
+              {% set i = i + 1 %}
+              {% endfor %}
+              ]
+            },
+            options: {
+              scales: {
+                yAxes: [{
+                  
+                }]
+              },
+              legend: {
+                display: true,
+                position: 'bottom',
+                
+                labels: {
+                  fontColor: '#71748d',
+                  fontFamily: 'Circular Std Book',
+                  fontSize: 14,
+                }
+              },
+              
+              scales: {
+                xAxes: [{
+                  ticks: {
+                    fontSize: 14,
+                    fontFamily: 'Circular Std Book',
+                    fontColor: '#71748d',
+                  }
+                }],
+                yAxes: [{
+                  ticks: {
+                    fontSize: 14,
+                    fontFamily: 'Circular Std Book',
+                    fontColor: '#71748d',
+                  }
+                }]
+              }
+            }
+            
+            
+          });
+        }
+        if ($('#donut').length) {
+          	var value = new Array(valores.length);
+          	var v_pre = {{respuestas|length}}
+          	{% set i = 0 %}
+         	{% for valor in registro.encuesta.valors %}
+           	value[{{i}}] = contador[{{i}}] * 100 / v_pre ;
+             {% set i = i + 1 %}
+            {% endfor %}
+          Morris.Donut({
+            element: 'donut',
+            data: [
+            {% set i = 0 %}
+            {% for valor in registro.encuesta.valors %}
+            
+            { value: value[{{i}}], label: '{{valor.descripcion}}' },
+            
+            {% set i = i + 1 %}
+            {% endfor %}
+            ],
+            
+            labelColor: '#2e2f39',
+            gridTextSize: '14px',
+            colors: [
+            {% for valor in registro.encuesta.valors %}
+              "{{valor.color}}",
+            {% endfor %}            
+            
+            ],
+            
+            formatter: function(x) { return x + "%"},
+            resize: false
+          });
+        }
+        
+      });
+      
+      
+    })(window, document, window.jQuery);
+  </script>
+  {% endblock %}

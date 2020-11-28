@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Categoria Encuesta {% endblock %}
+
+{% block body %}
+    <h1>Categoria Encuesta</h1>
+<div class="row">
+                    <!-- ============================================================== -->
+                    <!-- data table  -->
+                    <!-- ============================================================== -->
+                    <div class="col-xl-9 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Categoría Encuesta</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="example" class="table table-striped table-bordered second" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                
+                                                <th>Descripción</th>
+                                                <th>Fecha de creación</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for categoria_encuestum in categoria_encuestas %}
+                                            <tr>
+                                                
+                                                <td>{{ categoria_encuestum.descripcion }}</td>
+                                                <td>{{ categoria_encuestum.dateCreate ? categoria_encuestum.dateCreate|date('Y-m-d') : '' }}</td>
+                                                <td>
+                                                    <a href="{{ path('categoria_encuesta_show', {'id': categoria_encuestum.id}) }}">show</a>
+                                                    <a href="{{ path('categoria_encuesta_edit', {'id': categoria_encuestum.id}) }}">edit</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4">no records found</td>
+                                            </tr>
+        								{% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                
+                                                <th>Descripción</th>
+                                                <th>Fecha de creación</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+  {{ include('categoria_valor/_form.html.twig') }}
+  </div>
+	
+{% endblock %}    
