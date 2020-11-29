@@ -38,21 +38,21 @@ class EncuestaController extends AbstractController
   {
     #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
-    
+
     #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
-      
+
       #Obtenemos el query enviado en el front mediante un formulario para posteriormente filtrar
       $query_category = $request->query->get('category');
       $query_status = $request->query->get('query_status');
-      
+
       #Renderizamos
       return $this->render('encuesta/index.html.twig', [
         'encuestas' => $encuestaRepository->findBy(['user'=>$user_id]),
         'categorias' => $CategoriaEncuestaRepository->findBy(['user'=>$user_id]),
         'query_category' => $query_category,
         'query_status' => $query_status
-      
+
       ]);
     }else{
       #En caso de que no haya un usuario logueado redireccionara al login
@@ -60,7 +60,7 @@ class EncuestaController extends AbstractController
     }
 
   }
-  
+
 
   /**
   * @Route("/global", name="encuesta_analytics", methods={"GET"})
@@ -69,14 +69,14 @@ class EncuestaController extends AbstractController
   {
     #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
-    
+
     #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
       return $this->render('encuesta/global.html.twig', [
         'encuestas' => $encuestaRepository->EncuestaAnalytics($user_id),
         'categorias_v' => $CategoriaValorRepository->findBy(['user'=>$user_id]),
         'categorias_e' => $CategoriaEncuestaRepository->findBy(['user'=>$user_id]),
-      
+
       ]);
     }else{
       #En caso de que no haya un usuario logueado redireccionara al login
@@ -102,25 +102,25 @@ class EncuestaController extends AbstractController
   {
     #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
-    
+
     #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
       #Guardamos una nueva entidad en una variable
       $encuestum = new Encuesta();
-      
+
       #Creamos un formulario bajo la variable anteriormente creada
       $form = $this->createForm(EncuestaType::class, $encuestum);
       $form->handleRequest($request);
-      
+
       #Creamos una variable para objeter las funciones del Doctrine (Esto con el fin de manejar la base de datos)
       $entityManager = $this->getDoctrine()->getManager();
-      
+
       #Preguntamos si el formulario es valido y ha sido enviado
       if ($form->isSubmitted() && $form->isValid()) {
-        
+
         # obtenemos la data del banner a guardar en la encuesta
         $brochureFile = $form->get('banner')->getData();
-        
+
         # Preguntamos si no es nulo el valor del banner
         if ($brochureFile) {
             $originalFilename = pathinfo($brochureFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -146,8 +146,8 @@ class EncuestaController extends AbstractController
         $encuestum->setUser($user_id);
         $entityManager->persist($encuestum);
         $entityManager->flush();
-      
-        
+
+
         return $this->redirectToRoute('encuesta_index');
       }
 
@@ -160,42 +160,58 @@ class EncuestaController extends AbstractController
     }
 
   }
-  
+
   /**
   * @Route("/duply/{id}", name="encuesta_duply", methods={"GET"})
   */
   public function duply(Encuesta $encuesta, Request $request): Response
   {
+    #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
+
+    #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
+      #Guardamos una nueva entidad en una variable
       $encuesta_new = new Encuesta();
-      
+
+      #Creamos una variable para objeter las funciones del Doctrine (Esto con el fin de manejar la base de datos)
       $entityManager = $this->getDoctrine()->getManager();
+
+      #Obtenemos todos los datos de la encuesta que copiaremos
       $descripcion_e = $encuesta->getDescripcion();
       $banner_e = $encuesta->getBanner();
       $categoria_e = $encuesta->getCategoria();
       $color_e = $encuesta->getBackground();
       $instructivo_e = $encuesta->getInstructivo();
+
+      #Asignamos todos los valores a la nueva Encuesta
       $encuesta_new->setDescripcion($descripcion_e);
       $encuesta_new->setBanner($banner_e);
       $encuesta_new->setCategoria($categoria_e);
       $encuesta_new->setInstructivo("$instructivo_e");
       $encuesta_new->setBackground($color_e);
       $encuesta_new->setUser($user_id);
+
+      #Creamos la encuesta
       $entityManager->persist($encuesta_new);
       $entityManager->flush();
+
+      #Obtenemos las preguntas y valores de la encuesta
       $preguntas = $encuesta->getPregunta();
       $valores = $encuesta->getValors();
+
+      #Ahora recorremos los valores de la encuesta a copiar y asignamos los valores a la nueva encuesta
       $valores_a = array();
       $idx = 0;
       foreach ($valores as $valor) {
         $encuesta_new->addValor($valor);
       }
-      
+
+      #Ahora recorremos las Preguntas de la encuesta a copiar y asignamos los valores a la nueva encuesta
       foreach ($preguntas as $pregunta) {
         $pregunta_new = new Pregunta();
         $selecciones = $pregunta->getSeleccion();
-        $grupos = $pregunta->getGrupos(); 
+        $grupos = $pregunta->getGrupos();
         $descripcion_p = $pregunta->getDescripcion();
         $type_p = $pregunta->getType();
         $posicion_p = $pregunta->getPosicion();
@@ -205,7 +221,7 @@ class EncuestaController extends AbstractController
         $pregunta_new->setPosicion($posicion_p);
         $entityManager->persist($pregunta_new);
         $entityManager->flush();
-        
+
         foreach ($selecciones as $seleccion_p) {
           $seleccion = new Seleccion();
           $descripcion_s = $seleccion_p->getDescripcion();
@@ -221,31 +237,38 @@ class EncuestaController extends AbstractController
           $descripcion_s = $grupo_p->getDescripcion();
           $grupo->setPregunta($pregunta_new);
           $grupo->setDescripcion($descripcion_s);
-          
+
           $entityManager->persist($grupo);
           $entityManager->flush();
         }
-        
+
       }
       return $this->redirectToRoute('encuesta_index');
-      
-    	 
+
+
     }
     else{
       return $this->redirectToRoute('app_login');
     }
 
   }
-  
+
   /**
   * @Route("/status/{id}", name="encuesta_status", methods={"GET"})
   */
   public function status(Encuesta $encuesta, Request $request): Response
   {
+    #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
+
+    #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
       $entityManager = $this->getDoctrine()->getManager();
+
+      #Obtenemos el status de la Encuesta
       $status = $encuesta->getStatus();
+
+      #Preguntamos si esta abierta, en tal caso la cerramos y si no la abrimos
       if ($status == 1) {
         $action = 0;
       } else {
@@ -254,18 +277,18 @@ class EncuestaController extends AbstractController
       $encuesta->setStatus($action);
       $entityManager->persist($encuesta);
       $entityManager->flush();
-    
-    
+
+
       return $this->redirectToRoute('encuesta_index');
-      
-    	 
+
+
     }
     else{
       return $this->redirectToRoute('app_login');
     }
 
   }
-  
+
   /**
   * @Route("/{id}", name="encuesta_show", methods={"GET"})
   */
@@ -276,12 +299,12 @@ class EncuestaController extends AbstractController
       	$query_category_valor = $request->query->get('category_valor');
       	$query_clasificacion = $request->query->get('query_clasificacion');
     	return $this->render('encuesta/show.html.twig', [
-        
+
         'encuesta' => $encuestum,
         'categorias_v' => $CategoriaValorRepository->findBy(['user'=>$user_id]),
         'query_category_valor' => $query_category_valor,
         'query_clasificacion' => $query_clasificacion
-        
+
     	]);
     }
     else{
@@ -290,13 +313,15 @@ class EncuestaController extends AbstractController
 
   }
 
-  
+
 
   /**
   * @Route("/{id}/registro", name="encuesta_client",options={"expose"=true}, methods={"GET", "POST"})
   */
   public function show_cliente(Request $request, Encuesta $encuestum): Response
   {
+
+    #
     $preguntas = $encuestum->getPregunta();
     if($request->isXMLHttpRequest()){
           $registro = new Registro();
@@ -323,7 +348,7 @@ class EncuestaController extends AbstractController
           if ($encuestum->getCategoria()) {
             $registro->setCategoria($encuestum->getCategoria());
           }
-          
+
           $entityManager->persist($registro);
           $entityManager->flush();
           $idx1 = 1;
@@ -457,7 +482,7 @@ class EncuestaController extends AbstractController
       $id_v = $request->request->get('id_v');
       $id_e = $request->request->get('id_e');
       $status = $request->request->get('status');
-      
+
       $entityManager = $this->getDoctrine()->getManager();
       $encuesta = $entityManager->getRepository(Encuesta::class)->find($id_e);
       $valor = $entityManager->getRepository(Valor::class)->find($id_v);
@@ -470,16 +495,16 @@ class EncuestaController extends AbstractController
             $seleccion->removeRespuesta($respuesta);
           }
         }
-            
-        
-      
+
+
+
       } else {
         $valor->addEncuestum($encuesta);
       }
       $entityManager->persist($valor);
       $entityManager->flush();
 
-      
+
       return new JsonResponse($status);
     }
     else{
@@ -487,7 +512,7 @@ class EncuestaController extends AbstractController
     }
 
   }
-  
+
   /**
   * @Route("/orden", options={"expose"=true}, name="order_encuesta")
   */
@@ -502,7 +527,7 @@ class EncuestaController extends AbstractController
       $entityManager = $this->getDoctrine()->getManager();
       for ($idx=0; $idx < count($posiciones); $idx++) {
         $pregunta = $entityManager->getRepository(Pregunta::class)->find($posiciones[$idx]["posicion"]);
-      
+
         $pregunta->setPosicion($idx);
         $entityManager->flush();
 
@@ -591,7 +616,7 @@ class EncuestaController extends AbstractController
 
   }
 
-  
+
   /**
   * @Route("/save_e", options={"expose"=true}, name="save_encuesta")
   */
@@ -677,7 +702,7 @@ class EncuestaController extends AbstractController
     }
 
   }
-  
+
   /**
   * @Route("/add", options={"expose"=true}, name="add_pregunta")
   */
@@ -713,7 +738,7 @@ class EncuestaController extends AbstractController
     }
 
   }
-   
+
 
 
   /**
@@ -829,20 +854,20 @@ class EncuestaController extends AbstractController
             $categoria_d = 'Sin Categoria';
             $categoria_id = null;
           }
-          
+
           $temp = array(
             'id_v' => $valor->getId(),
             'descripcion' => $valor->getDescripcion(),
-            
+
           );
           $valores_ep[$idx4++] = $temp;
         }
       }
-      
-      
+
+
       foreach ($valores as $valor){
         $active = false;
-        
+
           foreach($valor->getEncuesta() as $encuesta_v){
             if ($encuesta_v->getId() == $encuesta->getId()) {
               $active = true;
@@ -851,8 +876,8 @@ class EncuestaController extends AbstractController
               $active = false;
             }
           }
-        
-        
+
+
         if ($valor->getCategoria()) {
           $categoria_id = $valor->getCategoria()->getId();
           $categoria_d = $valor->getCategoria()->getDescripcion();
@@ -860,7 +885,7 @@ class EncuestaController extends AbstractController
           $categoria_d = 'Sin Categoria';
           $categoria_id = null;
         }
-        
+
         $temp = array(
           'id_v' => $valor->getId(),
           'descripcion' => $valor->getDescripcion(),
