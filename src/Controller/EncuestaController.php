@@ -36,10 +36,17 @@ class EncuestaController extends AbstractController
   */
   public function index(Request $request, EncuestaRepository $encuestaRepository, CategoriaEncuestaRepository $CategoriaEncuestaRepository): Response
   {
+    #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
+    
+    #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
+      
+      #Obtenemos el query enviado en el front mediante un formulario para posteriormente filtrar
       $query_category = $request->query->get('category');
       $query_status = $request->query->get('query_status');
+      
+      #Renderizamos
       return $this->render('encuesta/index.html.twig', [
         'encuestas' => $encuestaRepository->findBy(['user'=>$user_id]),
         'categorias' => $CategoriaEncuestaRepository->findBy(['user'=>$user_id]),
@@ -48,6 +55,7 @@ class EncuestaController extends AbstractController
       
       ]);
     }else{
+      #En caso de que no haya un usuario logueado redireccionara al login
       return $this->redirectToRoute('app_login');
     }
 
@@ -59,7 +67,10 @@ class EncuestaController extends AbstractController
   */
   public function encuesta_analytics(EncuestaRepository $encuestaRepository, CategoriaValorRepository $CategoriaValorRepository, CategoriaEncuestaRepository $CategoriaEncuestaRepository): Response
   {
+    #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
+    
+    #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
       return $this->render('encuesta/global.html.twig', [
         'encuestas' => $encuestaRepository->EncuestaAnalytics($user_id),
@@ -68,6 +79,7 @@ class EncuestaController extends AbstractController
       
       ]);
     }else{
+      #En caso de que no haya un usuario logueado redireccionara al login
       return $this->redirectToRoute('app_login');
     }
 
@@ -78,7 +90,7 @@ class EncuestaController extends AbstractController
   */
   public function success(EncuestaRepository $encuestaRepository): Response
   {
-
+      #Aqui renderizamos el template que muestra que los datos fueron enviados correctamente en el formulario final de la encuesta
       return $this->render('encuesta/success.html.twig');
 
   }
@@ -88,23 +100,36 @@ class EncuestaController extends AbstractController
   */
   public function new(Request $request, SluggerInterface $slugger): Response
   {
+    #Obtenemos la entidad del usuario logueado
     $user_id = $this->getUser();
+    
+    #Preguntamos si existe un usuario logueado (Por metodos de seguridad)
     if($user_id){
+      #Guardamos una nueva entidad en una variable
       $encuestum = new Encuesta();
       
+      #Creamos un formulario bajo la variable anteriormente creada
       $form = $this->createForm(EncuestaType::class, $encuestum);
       $form->handleRequest($request);
+      
+      #Creamos una variable para objeter las funciones del Doctrine (Esto con el fin de manejar la base de datos)
       $entityManager = $this->getDoctrine()->getManager();
+      
+      #Preguntamos si el formulario es valido y ha sido enviado
       if ($form->isSubmitted() && $form->isValid()) {
+        
+        # obtenemos la data del banner a guardar en la encuesta
         $brochureFile = $form->get('banner')->getData();
+        
+        # Preguntamos si no es nulo el valor del banner
         if ($brochureFile) {
             $originalFilename = pathinfo($brochureFile->getClientOriginalName(), PATHINFO_FILENAME);
 
-            // this is needed to safely include the file name as part of the URL
+            # Esto es necesario para incluir de forma segura el nombre del archivo como parte de la URL
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename.'-'.uniqid().'.'.$brochureFile->guessExtension();
 
-            // Move the file to the directory where brochures are stored
+            # Movemos el archivo al directorio donde se almacenan los banners
             try {
                 $brochureFile->move(
                     $this->getParameter('banner_directory'),
@@ -114,8 +139,8 @@ class EncuestaController extends AbstractController
                 throw new Exception("Ha ocurrido un error al subir la imagen $e");
             }
 
-            // updates the 'brochureFilename' property to store the PDF file name
-            // instead of its contents
+            # Actualizamos la propiedad 'brochureFilename' para almacenar el nombre del Banner
+            # en lugar de su contenido
             $encuestum->setBanner($newFilename);
         }
         $encuestum->setUser($user_id);
